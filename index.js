@@ -13,4 +13,3 @@ let createRandomUser = () => {
 };
 
 console.log(createRandomUser());
-
