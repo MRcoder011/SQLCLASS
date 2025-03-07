@@ -4,17 +4,19 @@ const connection =  mysql.createConnection({
     host: 'localhost',
     database: 'delta_app',
     user: 'root',
-    password: 'Rahmani@30  '
+    password: 'Rahmani@30'
   });
  try{
     connection.query("show TABLES" , (err , result) =>{
         if(err) throw err ;
         console.log(result);
-      })
+      });
  }catch (err){
 console.log(err);
  
  }
+ connection.end();
+ 
 
 let getRandomuser = () => {
     return {
@@ -24,5 +26,3 @@ let getRandomuser = () => {
         password: faker.internet.password()
     };
 };
-
-
