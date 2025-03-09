@@ -1,38 +1,52 @@
+require('dotenv').config();
 const { faker } = require('@faker-js/faker');
 const mysql = require('mysql2');
-const connection =  mysql.createConnection({
+const express = require("express");
+const app = express();
+
+app.use(express.json()); // Middleware to handle JSON requests
+
+// MySQL Connection Setup
+const connection = mysql.createConnection({
     host: 'localhost',
     database: 'delta_app',
     user: 'root',
-    password: 'Rahmani@30'
-  });
+    password: process.env.DB_PASSWORD // Use environment variables for security
+});
 
-  let getRandomuser = () => {
+// Connect to MySQL
+connection.connect(err => {
+    if (err) {
+        console.error("Database connection failed:", err);
+        return;
+    }
+    console.log("Connected to MySQL database.");
+});
+
+// Function to Generate Fake Users
+const getRandomUser = () => {
     return [
-      faker.string.uuid(), // Updated for newer versions
-       faker.internet.userName(), 
+        faker.datatype.uuid(), // Corrected faker function
+        faker.internet.userName(),
         faker.internet.email(),
-      faker.internet.password()
- ]
+        faker.internet.password()
+    ];
 };
 
-
-let q = "INSERT INTO user (id , username , password ) VALUES ?"
-let data = [];
-for (let i =1; i<= 100; i++){
-    data.push(getRandomuser()); // random fake user
-    
-}
-      
-
- try{
-    connection.query(q , [data] , (err , result) =>{
-        if(err) throw err ;
+// Routes
+app.get("/", (req, res) => {
+    let q = `SELECT COUNT(*) AS user_count FROM user`; // Ensure correct table name
+    connection.query(q, (err, result) => {
+        if (err) {
+            console.error("Database Query Error:", err);
+            return res.status(500).send("Database query failed.");
+        }
         console.log(result);
-      });
- }catch (err){
-console.log(err);
- 
- }
- connection.end();
- 
+        res.json(result);
+    });
+});
+
+// Start Server
+app.listen(8080, () => {
+    console.log("Server is listening on port 8080");
+});
