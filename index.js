@@ -1,22 +1,18 @@
-require('dotenv').config();
-const { faker } = require('@faker-js/faker');
-const mysql = require('mysql2');
+const { faker } = require("@faker-js/faker");
+const mysql = require("mysql2");
 const express = require("express");
-const path = require("path");
 const app = express();
-
-app.use(express.json()); // Middleware to handle JSON requests
 
 // MySQL Connection Setup
 const connection = mysql.createConnection({
-    host: 'localhost',
-    database: 'Delta_app',
-    user: 'root',
-    password: process.env.DB_PASSWORD // Use environment variables for security
+    host: "localhost",
+    user: "root",
+    database: "delta_app",
+    password: "mysql@123", // Replace with your actual MySQL password
 });
 
 // Connect to MySQL
-connection.connect(err => {
+connection.connect((err) => {
     if (err) {
         console.error("Database connection failed:", err);
         return;
@@ -27,31 +23,20 @@ connection.connect(err => {
 // Function to Generate Fake Users
 const getRandomUser = () => {
     return [
-        faker.string.uuid(), // Updated faker function
+        faker.string.uuid(), // Updated faker function for UUID
         faker.internet.userName(),
         faker.internet.email(),
-        faker.internet.password()
+        faker.internet.password(),
     ];
 };
 
-// Routes
+// Route to Handle Root URL
 app.get("/", (req, res) => {
-    let q = `SELECT COUNT(*) AS user_count FROM users`; // Ensure correct table name (assuming "users" is correct)
-    connection.query(q, (err, result) => {
-        if (err) {
-            console.error("Database Query Error:", err);
-            return res.status(500).json({ error: "Database query failed." });
-        }
-        console.log(result);
-        res.json(result);
-    });
+    res.send("Welcome to the Delta App!");
 });
 
-// Serve Static Files
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Start Server
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
